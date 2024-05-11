@@ -15,7 +15,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain_community.vectorstores import FAISS
 
 
-llm = ChatOpenAI(model='gpt-4-turbo')
+llm = ChatOpenAI(model='gpt-4-turbo',api_key='sk-proj-wpZrq4sZaw26n1MgtN1iT3BlbkFJ0eSFGg4b7fkvK2PLeqS2')
 memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100)
 app = Flask(__name__)
 CORS(app)
@@ -49,22 +49,6 @@ def get_data():
 
 
 # Functions
-def load_rules_from_doc(doc_path):
-    doc = docx.Document(doc_path)
-    text = ''
-    for para in doc.paragraphs:
-        text += para.text + ' '
-
-    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-    texts = text_splitter.split_text(text)
-
-    embeddings = OpenAIEmbeddings()
-    vectorstore = Chroma.from_texts(texts, embeddings)
-
-    chain = load_qa_chain(llm, chain_type="stuff")
-    return chain, vectorstore
-
-
 def init_qa_system(doc_path):
     global chain, docsearch
 
