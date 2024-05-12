@@ -13,10 +13,12 @@ from langchain.text_splitter import CharacterTextSplitter
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain.chains.question_answering import load_qa_chain
 from langchain_community.vectorstores import FAISS
+from langchain_core.prompts import PromptTemplate
 
-
-llm = ChatOpenAI(model='gpt-4-turbo',api_key='sk-proj-wpZrq4sZaw26n1MgtN1iT3BlbkFJ0eSFGg4b7fkvK2PLeqS2')
-memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=100)
+llm = ChatOpenAI(model='gpt-4-turbo',
+                 api_key='sk-proj-wpZrq4sZaw26n1MgtN1iT3BlbkFJ0eSFGg4b7fkvK2PLeqS2')
+memory = ConversationBufferMemory(
+    memory_key="chat_history", input_key="human_input")
 app = Flask(__name__)
 CORS(app)
 
@@ -39,8 +41,9 @@ def get_data():
 
     try:
         docs = docsearch.similarity_search(user_input)
-        input = {'input_documents': docs, 'question': user_input}
+        input = {'input_documents': docs, 'human_input': user_input}
         output = chain.invoke(input=input)
+        memory.save_context({"human_input": user_input}, {"output": output["output_text"]})
         return jsonify({"response": True, "message": output["output_text"]})
     except Exception as e:
         print(e)
@@ -55,7 +58,7 @@ def init_qa_system(doc_path):
     doc = docx.Document(doc_path)
     text = ''
     for para in doc.paragraphs:
-        text += para.text + ' '
+        text += para.text + '\n'
 
     # split into chunks
     char_text_splitter = CharacterTextSplitter(separator="\n", chunk_size=1000,
@@ -63,11 +66,25 @@ def init_qa_system(doc_path):
 
     text_chunks = char_text_splitter.split_text(text)
 
+    template = """You are a chatbot having a conversation with a human, your name is Qiwy.
+                your answers must be short, if the human didn't gave you enough information, ask more details.
+                Given the following extracted parts of a long document and a question, create a final answer.
+
+                {context}
+
+                {chat_history}
+                Human: {human_input}
+                Chatbot:"""
+
+    prompt = PromptTemplate(
+        input_variables=["chat_history", "human_input", "context"], template=template
+    )
+
     # create embeddings
     embeddings = OpenAIEmbeddings()
     docsearch = FAISS.from_texts(text_chunks, embeddings)
 
-    chain = load_qa_chain(llm, chain_type="stuff")
+    chain = load_qa_chain(llm, chain_type="stuff", memory=memory,prompt=prompt)
 
 
 if __name__ == '__main__':
