@@ -15,8 +15,7 @@ from langchain.chains.question_answering import load_qa_chain
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
 
-llm = ChatOpenAI(model='gpt-4-turbo',
-                 api_key='sk-proj-wpZrq4sZaw26n1MgtN1iT3BlbkFJ0eSFGg4b7fkvK2PLeqS2')
+llm = ChatOpenAI(model='gpt-4-turbo')
 memory = ConversationBufferMemory(
     memory_key="chat_history", input_key="human_input")
 app = Flask(__name__)
