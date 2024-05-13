@@ -133,4 +133,4 @@ def init_qa_system(doc_path):
 if __name__ == '__main__':
     doc_path = './trainingData/laborLaw.docx'  # Replace with the actual path
     init_qa_system(doc_path)
-    app.run(port=4000)
+    app.run(host='0.0.0.0', port=4000)
