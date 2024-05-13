@@ -37,6 +37,9 @@ def index():
 def get_data():
     data = request.get_json()
     text = data.get('data')
+    passphrase = data.get('passphrase')
+    if passphrase != 'قوي':
+        return jsonify({"message": 'your not authorized', "response": False})
     user_input = text
 
     try:
