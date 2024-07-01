@@ -29,6 +29,7 @@ def get_data():
 
     try:
         output = generate_response(user_input,'','')
+        print(output)
         return jsonify({"response": True, "message": output["output_text"]})
     except Exception as e:
         print(e)
