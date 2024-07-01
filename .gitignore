@@ -1,2 +1,5 @@
 env
 .env
+venv
+threads_db.*
+__pycache__
