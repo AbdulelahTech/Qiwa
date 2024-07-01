@@ -143,39 +143,47 @@
     <script>
       // for scrolling messages
       function scrollToBottom() {
-        var div = document.getElementById('upperid')
-        div.scrollTop = div.scrollHeight
+        var div = document.getElementById('upperid');
+        div.scrollTop = div.scrollHeight;
       }
-      scrollToBottom()
-      
+      scrollToBottom();
+    
       document.getElementById('userinputform').addEventListener('submit', function (event) {
-        event.preventDefault()
-        formsubmitted()
-      })
-      
+        event.preventDefault();
+        formsubmitted();
+      });
+    
+      // Enable sending message on Enter key press in textarea
+      document.getElementById('userinput').addEventListener('keydown', function (event) {
+        if (event.keyCode === 13 && !event.shiftKey) { // Check if the Enter key is pressed without Shift
+          event.preventDefault();
+          document.getElementById('userinputform').dispatchEvent(new Event('submit')); // Trigger form submission
+        }
+      });
+    
       // sending request to python server
       const formsubmitted = async () => {
-        let userinput = document.getElementById('userinput').value
-        let passphrase = document.getElementById('passphrase').value // Get the passphrase input
-        let sendbtn = document.getElementById('sendbtn')
-        let userinputarea = document.getElementById('userinput')
-        let upperdiv = document.getElementById('upperid')
-      
+        let userinput = document.getElementById('userinput').value;
+        let passphrase = document.getElementById('passphrase').value; // Get the passphrase input
+        let sendbtn = document.getElementById('sendbtn');
+        let userinputarea = document.getElementById('userinput');
+        let upperdiv = document.getElementById('upperid');
+    
         upperdiv.innerHTML =
           upperdiv.innerHTML +
           `<div class="message">
-                      <div class="usermessagediv">
-                              <div class="usermessage">
-                                  ${userinput}
-                              </div>
-                      </div>
-                  </div>`
-        sendbtn.disabled = true
-        userinputarea.disabled = true
-        scrollToBottom()
-        document.getElementById('userinput').value = ''
-        document.getElementById('userinput').placeholder = 'انتظر رجاءاً...'
-      
+                <div class="usermessagediv">
+                  <div class="usermessage">
+                    ${userinput}
+                  </div>
+                </div>
+              </div>`;
+        sendbtn.disabled = true;
+        userinputarea.disabled = true;
+        scrollToBottom();
+        document.getElementById('userinput').value = '';
+        document.getElementById('userinput').placeholder = 'انتظر رجاءاً...';
+    
         const response = await fetch('https://qiwa.onrender.com/data', {
           method: 'POST',
           headers: {
@@ -185,58 +193,56 @@
             data: userinput,
             passphrase: passphrase // Include the passphrase in the payload
           })
-        })
-        let json = await response.json()
-      
-        document.getElementById('userinput').placeholder = 'رسالتك...'
-      
+        });
+        let json = await response.json();
+    
+        document.getElementById('userinput').placeholder = 'رسالتك...';
+    
         if (json.response) {
-          let message = json.message
-          message = message.toString()
-      
+          let message = json.message;
+          message = message.toString();
+    
           upperdiv.innerHTML =
             upperdiv.innerHTML +
             `<div class="message">
-                      <div class="appmessagediv">
-                          <div class="appmessage" id="temp">
-                              
-                          </div>
-                      </div>
-                  </div>`
-          let temp = document.getElementById('temp')
-          let index = 0
+                <div class="appmessagediv">
+                  <div class="appmessage" id="temp">
+                  </div>
+                </div>
+              </div>`;
+          let temp = document.getElementById('temp');
+          let index = 0;
           function displayNextLetter() {
-            scrollToBottom()
+            scrollToBottom();
             if (index < message.length) {
-              temp.innerHTML = temp.innerHTML + message[index]
-              index++
-              setTimeout(displayNextLetter, 30)
+              temp.innerHTML = temp.innerHTML + message[index];
+              index++;
+              setTimeout(displayNextLetter, 30);
             } else {
-              temp.removeAttribute('id')
-              sendbtn.disabled = false
-              userinputarea.disabled = false
+              temp.removeAttribute('id');
+              sendbtn.disabled = false;
+              userinputarea.disabled = false;
             }
           }
-          displayNextLetter()
-          scrollToBottom()
+          displayNextLetter();
+          scrollToBottom();
         } else {
-          let message = json.message
+          let message = json.message;
           upperdiv.innerHTML =
             upperdiv.innerHTML +
             `<div class="message">
-                      <div class="appmessagediv">
-                          <div class="appmessage"  style="border: 1px solid red;">
-                            ${message}
-      
-                          </div>
-                      </div>
-                  </div>`
-          sendbtn.disabled = false
-          userinputarea.disabled = false
+                <div class="appmessagediv">
+                  <div class="appmessage" style="border: 1px solid red;">
+                    ${message}
+                  </div>
+                </div>
+              </div>`;
+          sendbtn.disabled = false;
+          userinputarea.disabled = false;
         }
-      
-        scrollToBottom()
-      }
-    </script>
+    
+        scrollToBottom();
+      };
+    </script>    
   </body>
 </html>
