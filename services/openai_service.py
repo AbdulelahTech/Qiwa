@@ -10,7 +10,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_ASSISTANT_ID = os.getenv("OPENAI_ASSISTANT_ID")
 print("OPENAI_ASSISTANT_ID")
 print(OPENAI_ASSISTANT_ID)
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=OPENAI_API_KEY,organization='org-WjfAEuu5Dz2x9pxX9TwSTySn',project='proj_JtJ2Fcg4zLyJaGIlMa8afk8R')
 
 
 def upload_file(path):

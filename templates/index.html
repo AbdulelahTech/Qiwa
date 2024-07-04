@@ -203,23 +203,39 @@
         if (json.response) {
           let message = json.message;
           message = message.toString();
-  
-          upperdiv.innerHTML +=
+          
+          // Use marked to convert the message from Markdown to HTML
+          let htmlMessage = marked.parse(message);
+        
+          upperdiv.innerHTML =
+            upperdiv.innerHTML +
             `<div class="message">
                 <div class="appmessagediv">
                   <div class="appmessage" id="temp">
-                    ${marked(message)}
+                  ${htmlMessage}
                   </div>
                 </div>
               </div>`;
-          scrollToBottom();
           let temp = document.getElementById('temp');
-          temp.removeAttribute('id');
+          let index = 0;
+          function displayNextLetter() {
+            scrollToBottom();
+            if (index < htmlMessage.length) {
+              temp.innerHTML = temp.innerHTML + htmlMessage[index];
+              index++;
+              setTimeout(displayNextLetter, 30);
+            } else {
+              temp.removeAttribute('id');
+            }
+          }
+          // displayNextLetter();
+          scrollToBottom();
           sendbtn.disabled = false;
           userinputarea.disabled = false;
         } else {
           let message = json.message;
-          upperdiv.innerHTML +=
+          upperdiv.innerHTML =
+            upperdiv.innerHTML +
             `<div class="message">
                 <div class="appmessagediv">
                   <div class="appmessage" style="border: 1px solid red;">
@@ -230,8 +246,9 @@
           sendbtn.disabled = false;
           userinputarea.disabled = false;
         }
-  
-        scrollToBottom();  
+        
+    
+        scrollToBottom();
       };
     </script>    
   </body>
